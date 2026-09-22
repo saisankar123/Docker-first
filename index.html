@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brew & Bloom Café</title>
+  <style>
+    :root {
+      --coffee: #4b2e20;
+      --coffee-dark: #2b1a14;
+      --cream: #fff8ee;
+      --latte: #ead8c0;
+      --gold: #d49b52;
+      --text: #30231e;
+      --white: #fff;
+      --shadow: 0 12px 35px rgba(43, 26, 20, .12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--cream);
+      line-height: 1.6;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(255, 248, 238, .92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(75, 46, 32, .08);
+    }
+    .nav-inner {
+      max-width: 1150px;
+      margin: auto;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      color: var(--coffee);
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    .logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 25px; list-style: none; }
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 650;
+      font-size: .95rem;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .cart-btn {
+      border: 0;
+      background: var(--coffee);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .cart-count {
+      background: var(--gold);
+      color: var(--coffee-dark);
+      padding: 2px 7px;
+      border-radius: 50%;
+      margin-left: 4px;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 120px 22px 70px;
+      background:
+        radial-gradient(circle at 80% 25%, rgba(212,155,82,.24), transparent 30%),
+        linear-gradient(135deg, #fff8ee 0%, #f4e6d3 100%);
+    }
+    .hero-inner {
+      max-width: 1150px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      align-items: center;
+      gap: 55px;
+    }
+    .eyebrow {
+      color: var(--gold);
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: .8rem;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.8rem);
+      line-height: .98;
+      color: var(--coffee-dark);
+      margin-bottom: 22px;
+    }
+    .hero p {
+      max-width: 570px;
+      font-size: 1.08rem;
+      color: #69544a;
+      margin-bottom: 30px;
+    }
+    .cta {
+      display: flex;
+      gap: 13px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 0;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-primary { background: var(--coffee); color: white; }
+    .btn-secondary { border: 1px solid #cdb59b; color: var(--coffee); background: transparent; }
+
+    .coffee-art {
+      width: min(450px, 80vw);
+      aspect-ratio: 1;
+      margin: auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #9b633f 0 25%, #71452f 26% 34%, #4b2e20 35% 49%, #d49b52 50% 51%, #ead8c0 52% 68%, #fff8ee 69%);
+      box-shadow: 25px 30px 60px rgba(75,46,32,.2);
+      display: grid;
+      place-items: center;
+      transform: rotate(-8deg);
+    }
+    .coffee-art::after {
+      content: "☕";
+      font-size: 8rem;
+      filter: drop-shadow(0 15px 12px rgba(0,0,0,.18));
+    }
+
+    section { padding: 90px 22px; }
+    .section-inner { max-width: 1150px; margin: auto; }
+    .section-title { text-align: center; margin-bottom: 45px; }
+    .section-title h2 { font-size: clamp(2rem, 4vw, 3.2rem); color: var(--coffee-dark); }
+    .section-title p { color: #766158; margin-top: 7px; }
+
+    .menu-controls {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    .filter {
+      border: 1px solid #dcc6ad;
+      background: white;
+      color: var(--coffee);
+      padding: 9px 15px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .filter.active, .filter:hover { background: var(--coffee); color: white; }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      transition: transform .2s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .food-img {
+      height: 180px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-size: 4.2rem;
+      background: linear-gradient(135deg, #f2dfc8, #e7c49f);
+      margin-bottom: 16px;
+    }
+    .card h3 { color: var(--coffee); }
+    .card p { color: #79675e; font-size: .92rem; margin: 5px 0 13px; }
+    .card-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .price { color: var(--coffee-dark); font-weight: 900; }
+    .add {
+      border: 0;
+      background: var(--coffee);
+      color: white;
+      padding: 9px 13px;
+      border-radius: 9px;
+      font-weight: 750;
+    }
+
+    .about {
+      background: var(--coffee-dark);
+      color: white;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+    .about h2 { font-size: 3rem; line-height: 1.05; margin-bottom: 17px; }
+    .about p { color: #d8c7ba; }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 28px; }
+    .stat {
+      background: rgba(255,255,255,.08);
+      padding: 17px;
+      border-radius: 14px;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 1.5rem; color: #f0c88f; }
+
+    .reserve {
+      background: #f4e6d3;
+    }
+    .form {
+      max-width: 720px;
+      margin: auto;
+      background: white;
+      padding: 28px;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-weight: 750; color: var(--coffee); }
+    .field input, .field select {
+      border: 1px solid #dcc6ad;
+      border-radius: 10px;
+      padding: 12px;
+      outline: none;
+      background: #fffdfa;
+    }
+    .field input:focus, .field select:focus { border-color: var(--gold); }
+    .form .btn { width: 100%; }
+
+    footer {
+      background: #21140f;
+      color: #cbb9ad;
+      padding: 28px 22px;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      background: var(--coffee-dark);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s;
+      z-index: 2000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .cart-panel {
+      position: fixed;
+      right: -390px;
+      top: 0;
+      width: min(390px, 100%);
+      height: 100vh;
+      background: white;
+      z-index: 1500;
+      box-shadow: -15px 0 40px rgba(0,0,0,.15);
+      transition: right .3s;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-panel.open { right: 0; }
+    .cart-head { display: flex; justify-content: space-between; align-items: center; }
+    .close { border: 0; background: #f2e6da; border-radius: 50%; width: 35px; height: 35px; }
+    .cart-items { flex: 1; overflow: auto; margin: 20px 0; }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item small { display: block; color: #806e64; }
+    .remove { border: 0; background: transparent; color: #b15e43; font-weight: 700; }
+    .cart-total { font-size: 1.2rem; font-weight: 900; display: flex; justify-content: space-between; margin-bottom: 13px; }
+
+    @media (max-width: 850px) {
+      .hero-inner, .about-grid { grid-template-columns: 1fr; }
+      .hero { text-align: center; }
+      .hero p { margin-inline: auto; }
+      .cta { justify-content: center; }
+      .menu-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 550px) {
+      .menu-grid, .form { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .stats { grid-template-columns: 1fr; }
+      .coffee-art { width: 280px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <a class="logo" href="#home">Brew <span>&</span> Bloom</a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#reserve">Reserve</a></li>
+        </ul>
+      </nav>
+      <button class="cart-btn" onclick="toggleCart()">Cart <span class="cart-count" id="cartCount">0</span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Freshly brewed every day</div>
+          <h1>Your daily cup of happiness.</h1>
+          <p>
+            Specialty coffee, fresh bakes and cozy conversations.
+            Drop in for your favorite brew or order something delicious for the table.
+          </p>
+          <div class="cta">
+            <a class="btn btn-primary" href="#menu">Explore Menu</a>
+            <a class="btn btn-secondary" href="#reserve">Book a Table</a>
+          </div>
+        </div>
+        <div class="coffee-art" aria-label="Coffee illustration"></div>
+      </div>
+    </section>
+
+    <section id="menu">
+      <div class="section-inner">
+        <div class="section-title">
+          <div class="eyebrow">Made with love</div>
+          <h2>Our Menu</h2>
+          <p>Tap a category and discover your next favorite.</p>
+        </div>
+
+        <div class="menu-controls">
+          <button class="filter active" data-filter="all">All</button>
+          <button class="filter" data-filter="coffee">Coffee</button>
+          <button class="filter" data-filter="food">Food</button>
+          <button class="filter" data-filter="dessert">Desserts</button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="section-inner about-grid">
+        <div>
+          <div class="eyebrow">Our story</div>
+          <h2>A little café with a big love for coffee.</h2>
+          <p>
+            Brew & Bloom started with one espresso machine, two friends and a simple idea:
+            make excellent coffee and create a place where people want to stay a little longer.
+          </p>
+          <div class="stats">
+            <div class="stat"><strong>8+</strong>Years brewing</div>
+            <div class="stat"><strong>25K+</strong>Cups served</div>
+            <div class="stat"><strong>4.9★</strong>Guest rating</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 9rem; text-align:center;">🌿☕🥐</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reserve" id="reserve">
+      <div class="section-inner">
+        <div class="section-title">
+          <div class="eyebrow">Come say hello</div>
+          <h2>Reserve a Table</h2>
+          <p>Planning a coffee date? We'll save you a seat.</p>
+        </div>
+
+        <form class="form" id="reservationForm">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" required placeholder="Your name">
+          </div>
+          <div class="field">
+            <label for="people">Guests</label>
+            <select id="people">
+              <option>1 person</option>
+              <option>2 people</option>
+              <option>3 people</option>
+              <option>4 people</option>
+              <option>5+ people</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="time">Time</label>
+            <input id="time" type="time" required>
+          </div>
+          <div class="field full">
+            <button class="btn btn-primary" type="submit">Reserve My Table</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Brew & Bloom Café · Crafted with ☕</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <aside class="cart-panel" id="cartPanel">
+    <div class="cart-head">
+      <h2>Your Order</h2>
+      <button class="close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cartTotal">₹0</span>
+    </div>
+    <button class="btn btn-primary" onclick="checkout()">Place Order</button>
+  </aside>
+
+  <script>
+    const menu = [
+      { id: 1, name: "Classic Cappuccino", category: "coffee", price: 160, icon: "☕", desc: "Rich espresso with silky steamed milk." },
+      { id: 2, name: "Caramel Latte", category: "coffee", price: 190, icon: "🥛", desc: "Smooth latte finished with caramel." },
+      { id: 3, name: "Cold Brew", category: "coffee", price: 180, icon: "🧊", desc: "Slow-steeped, smooth and refreshing." },
+      { id: 4, name: "Avocado Toast", category: "food", price: 240, icon: "🥑", desc: "Sourdough, avocado, herbs and chili flakes." },
+      { id: 5, name: "Paneer Croissant", category: "food", price: 220, icon: "🥐", desc: "Flaky croissant with a savory filling." },
+      { id: 6, name: "Breakfast Bowl", category: "food", price: 260, icon: "🥣", desc: "Fresh fruit, granola, yogurt and honey." },
+      { id: 7, name: "Chocolate Brownie", category: "dessert", price: 150, icon: "🍫", desc: "Warm, fudgy and seriously chocolatey." },
+      { id: 8, name: "Cheesecake", category: "dessert", price: 190, icon: "🍰", desc: "Creamy cheesecake with berry compote." },
+      { id: 9, name: "Cinnamon Roll", category: "dessert", price: 140, icon: "🍥", desc: "Soft roll with cinnamon and vanilla glaze." }
+    ];
+
+    let cart = [];
+
+    const menuGrid = document.getElementById("menuGrid");
+    const cartCount = document.getElementById("cartCount");
+    const cartItems = document.getElementById("cartItems");
+    const cartTotal = document.getElementById("cartTotal");
+    const toast = document.getElementById("toast");
+
+    function renderMenu(filter = "all") {
+      const items = filter === "all" ? menu : menu.filter(item => item.category === filter);
+      menuGrid.innerHTML = items.map(item => `
+        <article class="card">
+          <div class="food-img">${item.icon}</div>
+          <h3>${item.name}</h3>
+          <p>${item.desc}</p>
+          <div class="card-bottom">
+            <span class="price">₹${item.price}</span>
+            <button class="add" onclick="addToCart(${item.id})">+ Add</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function addToCart(id) {
+      const item = menu.find(x => x.id === id);
+      const existing = cart.find(x => x.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ ...item, qty: 1 });
+      updateCart();
+      showToast(`${item.name} added to your order`);
+    }
+
+    function removeFromCart(id) {
+      const item = cart.find(x => x.id === id);
+      if (!item) return;
+      if (item.qty > 1) item.qty--;
+      else cart = cart.filter(x => x.id !== id);
+      updateCart();
+    }
+
+    function updateCart() {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+      cartCount.textContent = count;
+      cartTotal.textContent = `₹${total}`;
+
+      cartItems.innerHTML = cart.length
+        ? cart.map(item => `
+          <div class="cart-item">
+            <div>
+              <strong>${item.icon} ${item.name}</strong>
+              <small>₹${item.price} × ${item.qty}</small>
+            </div>
+            <button class="remove" onclick="removeFromCart(${item.id})">Remove</button>
+          </div>
+        `).join("")
+        : "<p>Your cart is empty. Add something delicious!</p>";
+    }
+
+    function toggleCart() {
+      document.getElementById("cartPanel").classList.toggle("open");
+    }
+
+    function checkout() {
+      if (!cart.length) {
+        showToast("Your cart is empty!");
+        return;
+      }
+      showToast("Order received! We'll prepare it fresh ☕");
+      cart = [];
+      updateCart();
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    document.querySelectorAll(".filter").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+        renderMenu(button.dataset.filter);
+      });
+    });
+
+    document.getElementById("reservationForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const people = document.getElementById("people").value;
+
+      showToast(`Thanks ${name}! Table for ${people} requested for ${date} at ${time}.`);
+      event.target.reset();
+    });
+
+    // Prevent selecting a date in the past.
+    document.getElementById("date").min = new Date().toISOString().split("T")[0];
+
+    renderMenu();
+    updateCart();
+  </script>
+</body>
+</html>
